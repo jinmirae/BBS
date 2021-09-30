@@ -41,8 +41,8 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 $(document)
 .on('click','tr',function(){
 	let bbs_id=$(this).find('td:eq(0)').text();//find('td:eq(0)')은 0번째 테이블 정보
-	console.log('bbs_id ['+bbs_id+']');
-	document.location="/view/"+bbs_id;
+	console.log('bbs_id ['+bbs_id+']');//게시물 고유번호 잘 전달되는지 확인하는 디버깅
+	document.location="/view/"+bbs_id;//이동되는페이지경로 view의 몇번째 게시물 예)/view/3
 	return false;
 })
 </script>
