@@ -9,4 +9,17 @@
 		values(seq_bbs_id.nextval,#{param1},#{param2},#{param3},#{param4},
 		to_char(sysdate,'YYYYMMDDHH24MI'),to_char(sysdate,'YYYYMMDDHH24MI'))
 	</insert>
+	<select id="getList" resultType="com.human.app.BBSrec"><!-- SQL출력 확인 완료 -->
+		select bbs_id,title,content,writer,created,updated from bbs order by created desc
+	</select>
+	<delete id="deletebbs">
+		delete from bbs where bbs_id=#{param1}
+	</delete>
+	<update id="updatebbs">
+		update bbs set title=#{param2},content=#{content3}
+			where bbs_id=#{param1}
+	</update>
+	<select id="getPost" resultType="com.human.app.BBSrec"><!-- 불러올 테이블명은 선언, 각 게시물의 고유번호인 bbs_id는 param을 입힌 후  -->
+		select bbs_id,title,content,writer,created,updated from bbs where bbs_id=#{param1}
+	</select>
 </mapper>
