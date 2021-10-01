@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -17,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 /**
  * Handles requests for the application home page.
@@ -71,7 +74,7 @@ public class HomeController {
 //	public String updateView() {
 //		return "update";
 //	}
-//	
+
 	@RequestMapping(value = "/save",method = RequestMethod.POST)//보여지는 jsp from의 action
 	public String insertBBS(HttpServletRequest hsr) {
 		String pTitle = hsr.getParameter("title");
@@ -86,20 +89,32 @@ public class HomeController {
 		return "redirect:/list";
 	}
 	
-	/*
-	 * @RequestMapping(value = "/update",method = RequestMethod.POST, produces =
-	 * "application/text; charset=utf8") public String updateBBS(HttpServletRequest
-	 * hsr) { int bbs_id=Integer.parseInt(hsr.getParameter("bbs_id")); String
-	 * title=hsr.getParameter("title"); String content=hsr.getParameter("content");
-	 * iBBS bbs=sqlSession.getMapper(iBBS.class);
-	 * bbs.updatebbs(bbs_id,title,content); return "redirect:/list"; }
-	 */
+	@RequestMapping(value = "/update/{bbs_id}",method = RequestMethod.GET, 
+			produces = "application/text; charset=utf8")
+	public String upviewBBS(@PathVariable("bbs_id")int bbs_id,Model model) {
+		iBBS bbs=sqlSession.getMapper(iBBS.class);
+		BBSrec post=bbs.getPost(bbs_id);
+		model.addAttribute("update",post);
+		return "/update";
+		}
+	 
+	@RequestMapping(value = "/update",method = RequestMethod.POST,
+			produces = "application/text; charset=utf8")
+	public String updateBBS(HttpServletRequest hsr) {
+		int uBbsid = Integer.parseInt(hsr.getParameter("bbs_id"));
+		String uTitle = hsr.getParameter("title");
+		String uContent = hsr.getParameter("content");
+		iBBS bbs = sqlSession.getMapper(iBBS.class);
+		bbs.updatebbs(uBbsid, uTitle, uContent);
+		return "redirect:/list";
+	}
 	
-	/*
-	 * @RequestMapping(value = "/delete",method = RequestMethod.GET, produces =
-	 * "application/text; charset=utf8") public String deleteBBS(HttpServletRequest
-	 * hsr) { int bbs_id=Integer.parseInt(hsr.getParameter("bbs_id")); iBBS
-	 * bbs=sqlSession.getMapper(iBBS.class); bbs.deletebbs(bbs_id); return
-	 * "redirect:/list"; }
-	 */
+	@RequestMapping(value = "/delete/{bbs_id}",method = RequestMethod.GET) 
+		public String deleteBBS(@PathVariable("bbs_id")int bbs_id,Model model) {
+		System.out.println("bbs_id ["+bbs_id+"]");
+			iBBS bbs=sqlSession.getMapper(iBBS.class);
+			bbs.deletebbs(bbs_id);
+			return "redirect:/list";
+		}	 
 }
+ 

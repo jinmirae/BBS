@@ -16,7 +16,7 @@
 		delete from bbs where bbs_id=#{param1}
 	</delete>
 	<update id="updatebbs">
-		update bbs set title=#{param2},content=#{content3}
+		update bbs set title=#{param2},content=#{param3}
 			where bbs_id=#{param1}
 	</update>
 	<select id="getPost" resultType="com.human.app.BBSrec"><!-- 불러올 테이블명은 선언, 각 게시물의 고유번호인 bbs_id는 param을 입힌 후  -->

@@ -15,8 +15,17 @@
 <tr><td>작성자</td><td><input type=text name=writer></td></tr>
 <tr><td>비밀번호</td><td><input type=password name=passcode></td></tr>
 <tr><td colspan=2><input type=submit value='글 등록'>&nbsp;
-	<input type=button value='취소(목록보기)'>
+	<input type=button id=btnDelete value='취소(목록보기)'>
 </table>
 </form>
 </body>
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script>
+$(document)
+.on('click','#btnDelete',function(){
+	document.location="/list";//document.location(페이지이동쿼리)
+	return false;
+})
+
+</script>
 </html>
