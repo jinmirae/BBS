@@ -8,7 +8,7 @@
 <title>새글쓰기</title>
 </head>
 <body>
-<form method=POST action="/save">
+<form method=POST action="/app/save">
 <table>
 <tr><td>제목</td><td><input type=text name=title></td></tr>
 <tr><td valign=top>내용</td><td><textarea name=content rows=20 cols=60></textarea></td></tr>

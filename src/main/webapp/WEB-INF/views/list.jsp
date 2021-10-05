@@ -19,6 +19,10 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 <body>
 <div id=box>
 	<h2>게시판목록</h2>
+		<c:if test="${loggined eq '1' }">
+			${userid}님 환영합니다.
+			<a href="/app/logout" id=btnLogout>로그아웃</a>
+		</c:if>
 		<table size="10" id="goList" style="width: 700px;"><!-- "c"taglib 불러오기는 필수!! -->
 			<thead>
 					<tr>
@@ -38,7 +42,12 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 					</c:forEach>
 				</tbody>
 		</table>
-		<input type="button" value="새글쓰기" id=btnNew>
+		<c:if test="${loggined eq '1' }">
+			<input type="button" value="새글쓰기" id=btnNew>
+		</c:if>
+		<c:if test="${loggined eq '0' }">
+			<input type="button" value="로그인" id=btnLogin>
+		</c:if>
 	</div><!-- box -->
 </body>
 
@@ -48,14 +57,21 @@ $(document)
 .on('click','tr',function(){
 	let bbs_id=$(this).find('td:eq(0)').text();//find('td:eq(0)')은 0번째 테이블 정보
 	console.log('bbs_id ['+bbs_id+']');//게시물 고유번호 잘 전달되는지 확인하는 디버깅
-	document.location="/view/"+bbs_id;//document.location(페이지이동쿼리)이동되는페이지경로 view의 몇번째 게시물 예)/view/3
+	document.location="/app/view/"+bbs_id;//document.location(페이지이동쿼리)이동되는페이지경로 view의 몇번째 게시물 예)/view/3
 	return false;
 })
 .on('click','#btnNew',function(){
-	document.location="/new";//document.location(페이지이동쿼리)
+	document.location="/app/new";//document.location(페이지이동쿼리)
 	return false;
 })
-
+.on('click','#btnLogin',function(){
+	document.location="/app/login";//document.location(페이지이동쿼리)
+	return false;
+})
+.on('click','#btnLogout',function(){
+	if(confirm("정말로 로그아웃할까요?")) return true
+	else return false;
+})
 </script>
 	
 </html>

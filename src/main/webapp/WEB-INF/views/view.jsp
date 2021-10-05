@@ -33,13 +33,13 @@ $(document)
 .on('click','#btnDelete',function(){
 		let bbs_id=$('#bbs_id').val();
 		console.log('bbs_id ['+bbs_id+']');//게시물 고유번호 전달 확인하는 디버깅
-		document.location="/delete/"+bbs_id;
+		document.location="/app/delete/"+bbs_id;
 		return false;
 })
 .on('click','#btnUpdate',function(){
 		let bbs_id=$('#bbs_id').val();
 		console.log('bbs_id ['+bbs_id+']');//게시물 고유번호 전달 확인하는 디버깅
-		document.location="/update/"+bbs_id;
+		document.location="/app/update/"+bbs_id;
 		return false;
 })
 </script>

@@ -8,7 +8,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<form method=POST action="/update">
+	<form method=POST action="/app/update">
 		<input type=text id=bbs_id name=bbs_id value='${update.bbs_id}'>
 		<table>
 			<tr><td>제목</td><td><input type=text id=title name=title value='${update.title}'></td></tr>

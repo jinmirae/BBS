@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.human.app.NEWbielist;
+
 
 /**
  * Handles requests for the application home page.
@@ -35,6 +37,7 @@ public class HomeController {
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
+	
 //	@RequestMapping(value = "/", method = RequestMethod.GET)
 //	public String home(Locale locale, Model model) {
 //		logger.info("Welcome home! The client locale is {}.", locale);
@@ -46,13 +49,68 @@ public class HomeController {
 //		return "home";
 //	}
 	
+	@RequestMapping("/login")
+	public String doLogin() {
+		return "login";
+	}
+	
+	@RequestMapping("/logout")
+	public String doLogout(HttpServletRequest hsr) {
+		HttpSession session=hsr.getSession();
+		session.invalidate();
+		return "redirect:/list";
+	}
+	
+	@RequestMapping("/newbie")
+	public String newbie() {
+		return "/newbie";
+	}
+	
+	@RequestMapping(value="/signin",method=RequestMethod.POST)//회원가입 DB
+	public String doSignin(HttpServletRequest hsr) {
+		String realname=hsr.getParameter("realname");
+		String userid=hsr.getParameter("userid");
+		String passcode=hsr.getParameter("passcode");
+		System.out.println("realname= ["+realname+"]");
+		System.out.println("userid= ["+userid+"]");
+		System.out.println("passcode= ["+passcode+"]");
+		iMember mem=sqlSession.getMapper(iMember.class);
+		mem.doSignin(realname, userid, passcode);
+		return "redirect:/login";
+	}
+	
+	@RequestMapping(value="/check_user", method=RequestMethod.POST)
+	public String reserve(HttpServletRequest hsr, Model model) {
+		String id=hsr.getParameter("id");
+		String pass=hsr.getParameter("pass");
+		System.out.println("id= ["+id+"]");
+		System.out.println("pass= ["+pass+"]");
+		//DB에서 유저확인 : 기존유저면 reserve, 없으면 home으로.
+		iMember member=sqlSession.getMapper(iMember.class);
+		int n=member.doCheckUser(id,pass);
+		if(n==1) {
+			HttpSession session=hsr.getSession();
+			session.setAttribute("userid", id);
+			return "redirect:/list";
+		} else {
+			return "redirect:/login";
+		}
+	}
+	
 	@RequestMapping(value = "/list",method = RequestMethod.GET)
 	public String getList(HttpServletRequest hsr, Model model) {
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
 		ArrayList<BBSrec> bbsrec = bbs.getList();
-		System.out.println(bbsrec);
+		HttpSession session=hsr.getSession();
+		String userid=(String) session.getAttribute("userid");
+		System.out.println("Userid ["+userid+"]");
+		if(userid==null || userid.equals("")) {
+			model.addAttribute("loggined","0");
+		} else {
+			model.addAttribute("loggined","1");
+			model.addAttribute("userid",userid);
+		}
 		model.addAttribute("letlist",bbsrec);
-		
 		return "list";
 	}
 	
