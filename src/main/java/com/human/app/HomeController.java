@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.human.app.NEWbielist;
 
 
 /**
@@ -50,7 +49,8 @@ public class HomeController {
 //	}
 	
 	@RequestMapping("/login")
-	public String doLogin() {
+	public String doLogin(HttpServletRequest hsr) {
+		if(loginUser(hsr)) return "redirect:/list";
 		return "login";
 	}
 	
@@ -62,12 +62,14 @@ public class HomeController {
 	}
 	
 	@RequestMapping("/newbie")
-	public String newbie() {
+	public String newbie(HttpServletRequest hsr) {
+		if(loginUser(hsr)) return "redirect:/list";
 		return "/newbie";
 	}
 	
 	@RequestMapping(value="/signin",method=RequestMethod.POST)//회원가입 DB
 	public String doSignin(HttpServletRequest hsr) {
+		if(loginUser(hsr)) return "redirect:/list";
 		String realname=hsr.getParameter("realname");
 		String userid=hsr.getParameter("userid");
 		String passcode=hsr.getParameter("passcode");
@@ -115,17 +117,32 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/view/{bbs_id}",method = RequestMethod.GET)
-	public String selectOnBBS(@PathVariable("bbs_id")int bbs_id,Model model) {
+	public String selectOnBBS(@PathVariable("bbs_id")int bbs_id,
+			HttpServletRequest hsr,Model model) {
+		if(!loginUser(hsr)) return "redirect:/list";
 		System.out.println("bbs_id ["+bbs_id+"]");
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
 		BBSrec post=bbs.getPost(bbs_id);
 		model.addAttribute("post",post);
+		HttpSession session=hsr.getSession();
+		model.addAttribute("userid",session.getAttribute("userid"));
+		
+		iReply r=sqlSession.getMapper(iReply.class);
+		ArrayList<Reply> replyList=r.getReplyList(bbs_id);
+		model.addAttribute("reply_list",replyList);
 		return "view";
 	}
 	
 	@RequestMapping(value = "/new",method = RequestMethod.GET)
-	public String brandNew() {
-		return "new";
+	public String brandNew(HttpServletRequest hsr) {
+//		HttpSession s=hsr.getSession();
+//		String userid=(String) s.getAttribute("userid");
+//		if(userid==null || userid.equals("")) {
+//			return "redirect:/list";
+//		}
+//		return "new";
+		if(loginUser(hsr)) return "new";
+		return "redirect:list";
 	}
 	
 //	@RequestMapping(value = "/update_view",method = RequestMethod.GET)
@@ -135,6 +152,8 @@ public class HomeController {
 
 	@RequestMapping(value = "/save",method = RequestMethod.POST)//보여지는 jsp from의 action
 	public String insertBBS(HttpServletRequest hsr) {
+		if(!loginUser(hsr)) return "redirect:/list";
+
 		String pTitle = hsr.getParameter("title");
 		String pContent = hsr.getParameter("content");
 		String pWriter = hsr.getParameter("writer");
@@ -149,7 +168,10 @@ public class HomeController {
 	
 	@RequestMapping(value = "/update/{bbs_id}",method = RequestMethod.GET, 
 			produces = "application/text; charset=utf8")
-	public String upviewBBS(@PathVariable("bbs_id")int bbs_id,Model model) {
+	public String upviewBBS(@PathVariable("bbs_id")int bbs_id,
+			HttpServletRequest hsr,Model model) {
+		if(!loginUser(hsr)) return "redirect:/list";
+		
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
 		BBSrec post=bbs.getPost(bbs_id);
 		model.addAttribute("update",post);
@@ -168,11 +190,52 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/delete/{bbs_id}",method = RequestMethod.GET) 
-		public String deleteBBS(@PathVariable("bbs_id")int bbs_id,Model model) {
+		public String deleteBBS(@PathVariable("bbs_id")int bbs_id,
+				HttpServletRequest hsr,Model model) {
+		if(!loginUser(hsr)) return "redirect:/list";
 		System.out.println("bbs_id ["+bbs_id+"]");
 			iBBS bbs=sqlSession.getMapper(iBBS.class);
 			bbs.deletebbs(bbs_id);
 			return "redirect:/list";
-		}	 
+		}	
+	
+	public boolean loginUser(HttpServletRequest hsr) {//로그인체크 
+		HttpSession s=hsr.getSession();
+		String userid=(String) s.getAttribute("userid");
+		if(userid==null || userid.equals("")) return false;//아이디 확인이 되면 경로 오픈
+		return true;
+		
+	}
+	
+	@RequestMapping(value ="/ReplyControl",method = RequestMethod.POST)
+	@ResponseBody
+	public String doReplyControl(HttpServletRequest hsr) {
+		System.out.println("doReplyControl");
+		String result="";
+		try {
+		String optype=hsr.getParameter("optype");
+		if(optype.equals("add")) {
+			String reply_content=hsr.getParameter("content");
+			int bbs_id=Integer.parseInt(hsr.getParameter("bbs_id"));
+			HttpSession s=hsr.getSession();
+			String userid=(String) s.getAttribute("userid");
+			System.out.println("userid ["+userid+"]");
+			iReply reply=sqlSession.getMapper(iReply.class);
+			reply.add(bbs_id,reply_content,userid);
+		} else if(optype.equals("delete")) {
+			int reply_id=Integer.parseInt(hsr.getParameter("reply_id"));
+				iReply reply=sqlSession.getMapper(iReply.class);
+				reply.delete(reply_id);
+				} else if(optype.equals("update")) {
+				}
+				result="ok";
+		} catch(Exception e) {
+			result="fail";
+		} finally {
+			return "result";
+		}
+	}
+	
 }
+	
  

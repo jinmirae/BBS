@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.human.app.iReply">
+	<insert id="add">
+		insert into reply values(seq_reply_id.nextval,#{param1},#{param2},#{param3},
+		to_char(sysdate,'YYYYMMDDHH24MI'),to_char(sysdate,'YYYYMMDDHH24MI'))
+	</insert>
+	<select id="getReplyList" resultType="com.human.app.Reply">
+		select reply_id,content,writer,created,updated
+			from reply where bbs_id=#{param1} order by created desc
+	</select>
+	<delete id="delete">
+		delete from reply where reply_id=#{param1}
+	</delete>
+</mapper>
