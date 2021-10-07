@@ -50,7 +50,7 @@ public class HomeController {
 	
 	@RequestMapping("/login")
 	public String doLogin(HttpServletRequest hsr) {
-		if(loginUser(hsr)) return "redirect:/list";
+		if(loginUser(hsr)) return "redirect:/list/1";
 		return "login";
 	}
 	
@@ -58,18 +58,18 @@ public class HomeController {
 	public String doLogout(HttpServletRequest hsr) {
 		HttpSession session=hsr.getSession();
 		session.invalidate();
-		return "redirect:/list";
+		return "redirect:/list/1";
 	}
 	
 	@RequestMapping("/newbie")
 	public String newbie(HttpServletRequest hsr) {
-		if(loginUser(hsr)) return "redirect:/list";
+		if(loginUser(hsr)) return "redirect:/list/1";
 		return "/newbie";
 	}
 	
 	@RequestMapping(value="/signin",method=RequestMethod.POST)//회원가입 DB
 	public String doSignin(HttpServletRequest hsr) {
-		if(loginUser(hsr)) return "redirect:/list";
+		if(loginUser(hsr)) return "redirect:/list/1";
 		String realname=hsr.getParameter("realname");
 		String userid=hsr.getParameter("userid");
 		String passcode=hsr.getParameter("passcode");
@@ -93,16 +93,27 @@ public class HomeController {
 		if(n==1) {
 			HttpSession session=hsr.getSession();
 			session.setAttribute("userid", id);
-			return "redirect:/list";
+			return "redirect:/list/1";
 		} else {
 			return "redirect:/login";
 		}
 	}
 	
-	@RequestMapping(value = "/list",method = RequestMethod.GET)
-	public String getList(HttpServletRequest hsr, Model model) {
+	@RequestMapping(value = {"/list","/list/{pageno}"},method = RequestMethod.GET)
+	public String getList(@PathVariable("pageno") int pageno,
+			HttpServletRequest hsr, Model model) {
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
-		ArrayList<BBSrec> bbsrec = bbs.getList();
+		int start=20*(pageno-1)+1;
+		int end=20*pageno;
+		ArrayList<BBSrec> bbsrec = bbs.getList(start,end);
+		String pDirection = "";
+		if(pageno==1) {
+			pDirection="<a href='/app/list/"+(pageno+1)+"'>다음페이지</a>";
+		} else {
+			pDirection="<a href='/app/list/"+(pageno-1)+"'>이전페이지</a>"+
+					"<a href='/app/list/"+(pageno+1)+"'>다음페이지</a>";
+		}
+		model.addAttribute("direct",pDirection);
 		HttpSession session=hsr.getSession();
 		String userid=(String) session.getAttribute("userid");
 		System.out.println("Userid ["+userid+"]");
@@ -119,7 +130,7 @@ public class HomeController {
 	@RequestMapping(value = "/view/{bbs_id}",method = RequestMethod.GET)
 	public String selectOnBBS(@PathVariable("bbs_id") int bbs_id,
 			HttpServletRequest hsr,Model model) {
-		if(!loginUser(hsr)) return "redirect:/list";
+		if(!loginUser(hsr)) return "redirect:/list/1";
 		System.out.println("bbs_id ["+bbs_id+"]");
 		//게시물 내용 가져오기
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
@@ -150,7 +161,7 @@ public class HomeController {
 		HttpSession s=hsr.getSession();
 		String userid=(String) s.getAttribute("userid");
 		if(userid==null || userid.equals("")) {
-			return "redirect:/list";
+			return "redirect:/list/1";
 		}
 		model.addAttribute("userid",userid);
 		return "new";
@@ -165,7 +176,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/save",method = RequestMethod.POST)//보여지는 jsp from의 action
 	public String insertBBS(HttpServletRequest hsr) {
-		if(!loginUser(hsr)) return "redirect:/list";
+		if(!loginUser(hsr)) return "redirect:/list/1";
 
 		String pTitle = hsr.getParameter("title");
 		String pContent = hsr.getParameter("content");
@@ -176,14 +187,14 @@ public class HomeController {
 		//insert into DB table
 		iBBS bbs=sqlSession.getMapper(iBBS.class);//인터페이스 호출 준비
 		bbs.writebbs(pTitle, pContent, pWriter/*, pPasscode*/);//인터페이스 paramiter 전달
-		return "redirect:/list";
+		return "redirect:/list/1";
 	}
 	
 	@RequestMapping(value = "/update/{bbs_id}",method = RequestMethod.GET, 
 			produces = "application/text; charset=utf8")
 	public String upviewBBS(@PathVariable("bbs_id")int bbs_id,
 			HttpServletRequest hsr,Model model) {
-		if(!loginUser(hsr)) return "redirect:/list";
+		if(!loginUser(hsr)) return "redirect:/list/1";
 		
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
 		BBSrec post=bbs.getPost(bbs_id);
@@ -199,17 +210,17 @@ public class HomeController {
 		String uContent = hsr.getParameter("content");
 		iBBS bbs = sqlSession.getMapper(iBBS.class);
 		bbs.updatebbs(uBbsid, uTitle, uContent);
-		return "redirect:/list";
+		return "redirect:/list/1";
 	}
 	
 	@RequestMapping(value = "/delete/{bbs_id}",method = RequestMethod.GET) 
 		public String deleteBBS(@PathVariable("bbs_id")int bbs_id,
 				HttpServletRequest hsr,Model model) {
-		if(!loginUser(hsr)) return "redirect:/list";
+		if(!loginUser(hsr)) return "redirect:/list/1";
 		System.out.println("bbs_id ["+bbs_id+"]");
 			iBBS bbs=sqlSession.getMapper(iBBS.class);
 			bbs.deletebbs(bbs_id);
-			return "redirect:/list";
+			return "redirect:/list/1";
 		}	
 	
 	public boolean loginUser(HttpServletRequest hsr) {//로그인체크 

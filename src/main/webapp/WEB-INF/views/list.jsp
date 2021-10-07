@@ -17,13 +17,12 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 </style>
 </head>
 <body>
-<div id=box>
 	<h2>게시판목록</h2>
 		<c:if test="${loggined eq '1' }">
 			${userid}님 환영합니다.
 			<a href="/app/logout" id=btnLogout>로그아웃</a>
 		</c:if>
-		<table size="10" id="goList" style="width: 700px;"><!-- "c"taglib 불러오기는 필수!! -->
+		<table size="10" id="goList" style="width: 700px; margin-top:7px; "><!-- "c"taglib 불러오기는 필수!! -->
 			<thead>
 					<tr>
 						<th>번호</th>
@@ -36,19 +35,20 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 				</thead>
 				<tbody>
 					<c:forEach items="${letlist}" var="bbs">
-						<option value="${bbs.bbs_id}">
 							<tr><td>${bbs.bbs_id}</td><td> ${bbs.title}</td><td> ${bbs.content}</td><td>${bbs.writer}</td><td>${bbs.created}</td><td>${bbs.updated}</td></tr>
-						</option>
 					</c:forEach>
 				</tbody>
-		</table>
+		<!--</table>-->
 		<c:if test="${loggined eq '1' }">
 			<input type="button" value="새글쓰기" id=btnNew>
 		</c:if>
 		<c:if test="${loggined eq '0' }">
 			<input type="button" value="로그인" id=btnLogin>
 		</c:if>
-	</div><!-- box -->
+		<tr>
+			<td colspan=2 align=center>${direct}</td>
+		</tr>
+		</table>
 </body>
 
 <script src="https://code.jquery.com/jquery-3.5.0.js"></script>

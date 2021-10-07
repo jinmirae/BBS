@@ -10,7 +10,11 @@
 		to_char(sysdate,'YYYYMMDDHH24MI'),to_char(sysdate,'YYYYMMDDHH24MI'))
 	</insert>
 	<select id="getList" resultType="com.human.app.BBSrec"><!-- SQL출력 확인 완료 -->
-		select bbs_id,title,content,writer,created,updated from bbs order by created desc
+		select rnum,bbs_id,title,content,writer,created,updated
+		from(select rownum as rnum,bbs_id,title,content,writer,created,updated
+				from bbs order by created desc)
+		where rnum between #{param1} and #{param2}
+		
 	</select>
 	<delete id="deletebbs">
 		delete from bbs where bbs_id=#{param1}
