@@ -5,8 +5,8 @@
 	
 <mapper namespace="com.human.app.iBBS">
 	<insert id="writebbs">
-		insert into bbs(bbs_id,title,content,writer,passcode,created,updated)
-		values(seq_bbs_id.nextval,#{param1},#{param2},#{param3},#{param4},
+		insert into bbs(bbs_id,title,content,writer,<!-- passcode, -->created,updated)
+		values(seq_bbs_id.nextval,#{param1},#{param2},#{param3},<!--#{param4},-->
 		to_char(sysdate,'YYYYMMDDHH24MI'),to_char(sysdate,'YYYYMMDDHH24MI'))
 	</insert>
 	<select id="getList" resultType="com.human.app.BBSrec"><!-- SQL출력 확인 완료 -->

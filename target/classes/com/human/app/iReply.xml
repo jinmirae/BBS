@@ -14,4 +14,8 @@
 	<delete id="delete">
 		delete from reply where reply_id=#{param1}
 	</delete>
+	<update id="update">
+		update reply set content=#{param1},updated=to_char(sysdate,'YYYYMMDDHH24MI')
+		where reply_id=#{param2}
+	</update>
 </mapper>

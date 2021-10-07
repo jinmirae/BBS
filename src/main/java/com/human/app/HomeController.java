@@ -117,15 +117,27 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/view/{bbs_id}",method = RequestMethod.GET)
-	public String selectOnBBS(@PathVariable("bbs_id")int bbs_id,
+	public String selectOnBBS(@PathVariable("bbs_id") int bbs_id,
 			HttpServletRequest hsr,Model model) {
 		if(!loginUser(hsr)) return "redirect:/list";
 		System.out.println("bbs_id ["+bbs_id+"]");
+		//게시물 내용 가져오기
 		iBBS bbs=sqlSession.getMapper(iBBS.class);
 		BBSrec post=bbs.getPost(bbs_id);
 		model.addAttribute("post",post);
+		//현재 사용자 아이디 가져오기
 		HttpSession session=hsr.getSession();
 		model.addAttribute("userid",session.getAttribute("userid"));
+		
+		//로그인여부 체크
+		String userid=(String) session.getAttribute("userid");
+		System.out.println("Userid ["+userid+"]");
+		if(userid==null || userid.equals("")) {
+			model.addAttribute("loggined","0");
+		} else {
+			model.addAttribute("loggined","1");
+			model.addAttribute("userid",userid);
+		}
 		
 		iReply r=sqlSession.getMapper(iReply.class);
 		ArrayList<Reply> replyList=r.getReplyList(bbs_id);
@@ -134,15 +146,16 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/new",method = RequestMethod.GET)
-	public String brandNew(HttpServletRequest hsr) {
-//		HttpSession s=hsr.getSession();
-//		String userid=(String) s.getAttribute("userid");
-//		if(userid==null || userid.equals("")) {
-//			return "redirect:/list";
-//		}
-//		return "new";
-		if(loginUser(hsr)) return "new";
-		return "redirect:list";
+	public String brandNew(HttpServletRequest hsr,Model model) {
+		HttpSession s=hsr.getSession();
+		String userid=(String) s.getAttribute("userid");
+		if(userid==null || userid.equals("")) {
+			return "redirect:/list";
+		}
+		model.addAttribute("userid",userid);
+		return "new";
+//		if(loginUser(hsr)) return "new";
+//		return "redirect:list";
 	}
 	
 //	@RequestMapping(value = "/update_view",method = RequestMethod.GET)
@@ -157,12 +170,12 @@ public class HomeController {
 		String pTitle = hsr.getParameter("title");
 		String pContent = hsr.getParameter("content");
 		String pWriter = hsr.getParameter("writer");
-		String pPasscode = hsr.getParameter("passcode");
+		//tring pPasscode = hsr.getParameter("passcode");
 		//debugging code
-		System.out.println("title ["+pTitle+"] content ["+pContent+"] writer ["+pWriter+"] passcode ["+pPasscode+"]");
+		//System.out.println("title ["+pTitle+"] content ["+pContent+"] writer ["+pWriter+"] passcode ["+pPasscode+"]");
 		//insert into DB table
 		iBBS bbs=sqlSession.getMapper(iBBS.class);//인터페이스 호출 준비
-		bbs.writebbs(pTitle, pContent, pWriter, pPasscode);//인터페이스 paramiter 전달
+		bbs.writebbs(pTitle, pContent, pWriter/*, pPasscode*/);//인터페이스 paramiter 전달
 		return "redirect:/list";
 	}
 	
@@ -213,22 +226,26 @@ public class HomeController {
 		System.out.println("doReplyControl");
 		String result="";
 		try {
-		String optype=hsr.getParameter("optype");
-		if(optype.equals("add")) {
-			String reply_content=hsr.getParameter("content");
-			int bbs_id=Integer.parseInt(hsr.getParameter("bbs_id"));
-			HttpSession s=hsr.getSession();
-			String userid=(String) s.getAttribute("userid");
-			System.out.println("userid ["+userid+"]");
-			iReply reply=sqlSession.getMapper(iReply.class);
-			reply.add(bbs_id,reply_content,userid);
-		} else if(optype.equals("delete")) {
-			int reply_id=Integer.parseInt(hsr.getParameter("reply_id"));
-				iReply reply=sqlSession.getMapper(iReply.class);
+			String optype=hsr.getParameter("optype");
+			iReply reply=sqlSession.getMapper(iReply.class);//get mapper는 필수!! 상단에 선언하여 사용 
+			if(optype.equals("add")) {
+				String reply_content=hsr.getParameter("content");
+				int bbs_id=Integer.parseInt(hsr.getParameter("bbs_id"));
+				System.out.println("bbs_id ["+bbs_id+"]");
+				HttpSession s=hsr.getSession();
+				String userid=(String) s.getAttribute("userid");
+				System.out.println("userid ["+userid+"]");
+				
+				reply.add(bbs_id,reply_content,userid);
+			} else if(optype.equals("delete")) {//댓글 삭제
+				int reply_id=Integer.parseInt(hsr.getParameter("reply_id"));
 				reply.delete(reply_id);
-				} else if(optype.equals("update")) {
-				}
-				result="ok";
+			} else if(optype.equals("update")) {//댓글 수정
+				String content=hsr.getParameter("content");
+				int reply_id=Integer.parseInt(hsr.getParameter("reply_id"));
+				reply.update(content, reply_id);
+			}
+			result="ok";
 		} catch(Exception e) {
 			result="fail";
 		} finally {
