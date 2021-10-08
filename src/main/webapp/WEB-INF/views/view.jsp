@@ -20,7 +20,7 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 	<c:if test="${loggined eq '1' }">
 		${userid}님 환영합니다.
 		<a href="/app/logout" id=btnLogout>로그아웃</a>
-		<a href="/app/list" id=btnback>목록보기</a>
+		<a href="/app/list/1" id=btnback>목록보기</a>
 	</c:if>
 	<input type=hidden id=bbs_id value='${post.bbs_id}'>
 	<table align=center valign=top>

@@ -20,7 +20,7 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 	<h2>게시판목록</h2>
 		<c:if test="${loggined eq '1' }">
 			${userid}님 환영합니다.
-			<a href="/app/logout" id=btnLogout>로그아웃</a>
+			<a href="/app/logout" id=btnLog        out>로그아웃</a>
 		</c:if>
 		<table size="10" id="goList" style="width: 700px; margin-top:7px; "><!-- "c"taglib 불러오기는 필수!! -->
 			<thead>
@@ -46,9 +46,12 @@ th { color: white; background-color: black; border: 1px solid yellow;}
 			<input type="button" value="로그인" id=btnLogin>
 		</c:if>
 		<tr>
-			<td colspan=2 align=center>${direct}</td>
+			<td></td>
+			<td></td>
+
 		</tr>
-		</table>
+		</table><br>
+		${direct}
 </body>
 
 <script src="https://code.jquery.com/jquery-3.5.0.js"></script>

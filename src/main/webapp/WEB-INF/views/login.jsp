@@ -16,7 +16,7 @@
 	                <input type="text" name=pass placeholder="비밀번호"/>
 					<input type="submit" value="로그인" ></input><br>
 	            <span class="form-footer">회원계정이 없습니까? <a href="/app/newbie">회원가입</a></span>
-	            	<a href="/app/list">목록보기</a>
+	            	<a href="/app/list/1">목록보기</a>
 		</form>
 </div>
 </body>
